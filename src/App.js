@@ -3,17 +3,15 @@ import { nanoid } from 'nanoid';
 
 class App extends Component {
   state = {
-    contacts: [],
+    contacts: [
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+    ],
     name: '',
     number: '',
-  };
-
-  inputHandler = e => {
-    const { value, name } = e.target;
-
-    this.setState({
-      [name]: value,
-    });
+    filter: '',
   };
 
   addContact = ({ name, number }) => {
@@ -28,6 +26,23 @@ class App extends Component {
     }));
   };
 
+  filterContacts = () => {
+    const { filter, contacts } = this.state;
+    const normalizedFilter = filter.toLocaleLowerCase();
+
+    return contacts.filter(contact =>
+      contact.name.toLocaleLowerCase().includes(normalizedFilter),
+    );
+  };
+
+  inputHandler = e => {
+    const { value, name } = e.target;
+
+    this.setState({
+      [name]: value,
+    });
+  };
+
   submitHandler = e => {
     e.preventDefault();
 
@@ -35,12 +50,18 @@ class App extends Component {
     this.reset();
   };
 
+  filterHandler = e => {
+    this.inputHandler(e);
+  };
+
   reset = () => {
     this.setState({ name: '', number: '' });
   };
 
   render() {
-    const { name, number } = this.state;
+    const { name, number, filter } = this.state;
+    const filteredContacts = this.filterContacts();
+
     return (
       <>
         <h1>Phonebook</h1>
@@ -73,8 +94,17 @@ class App extends Component {
         </form>
         <section>
           <h2>Contacts</h2>
+          <label>
+            Find contacts by name
+            <input
+              type="text"
+              name="filter"
+              value={filter}
+              onChange={this.filterHandler}
+            />
+          </label>
           <ul>
-            {this.state.contacts.map(({ id, name, number }) => {
+            {filteredContacts.map(({ id, name, number }) => {
               return (
                 <li key={id}>
                   {name}: {number}
